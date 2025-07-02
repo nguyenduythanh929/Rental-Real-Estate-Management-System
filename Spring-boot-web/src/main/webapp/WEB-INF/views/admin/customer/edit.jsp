@@ -379,6 +379,11 @@
             }
         });
     }
+
+    $('#btnCancelModal').click(function (e){
+        e.preventDefault();
+        $('#AddOrUpdateTransactionModal').modal('hide');
+    });
 </script>
 </body>
 </html>
