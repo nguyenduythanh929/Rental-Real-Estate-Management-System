@@ -122,13 +122,12 @@ public class UserService implements IUserService {
     @Override
     public UserDTO findOneByUserName(String userName) {
         UserEntity userEntity = userRepository.findOneByUserName(userName);
-        UserDTO userDTO = userConverter.convertToDto(userEntity);
-        return userDTO;
+        return userConverter.convertToDto(userEntity);
     }
 
     @Override
     public UserDTO findUserById(long id) {
-        UserEntity entity = userRepository.findById(id).get();
+        UserEntity entity = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         List<RoleEntity> roles = entity.getRoles();
         UserDTO dto = userConverter.convertToDto(entity);
         roles.forEach(item -> {
@@ -165,7 +164,7 @@ public class UserService implements IUserService {
     @Transactional
     public UserDTO update(Long id, UserDTO updateUser) {
         RoleEntity role = roleRepository.findOneByCode(updateUser.getRoleCode());
-        UserEntity oldUser = userRepository.findById(id).get();
+        UserEntity oldUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         UserEntity userEntity = userConverter.convertToEntity(updateUser);
         userEntity.setUserName(oldUser.getUserName());
         userEntity.setStatus(oldUser.getStatus());
@@ -177,7 +176,7 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public void updatePassword(long id, PasswordDTO passwordDTO) throws MyException {
-        UserEntity user = userRepository.findById(id).get();
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         if (passwordEncoder.matches(passwordDTO.getOldPassword(), user.getPassword())
                 && passwordDTO.getNewPassword().equals(passwordDTO.getConfirmPassword())) {
             user.setPassword(passwordEncoder.encode(passwordDTO.getNewPassword()));
@@ -190,7 +189,7 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public UserDTO resetPassword(long id) {
-        UserEntity userEntity = userRepository.findById(id).get();
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         userEntity.setPassword(passwordEncoder.encode(SystemConstant.PASSWORD_DEFAULT));
         return userConverter.convertToDto(userRepository.save(userEntity));
     }
@@ -207,7 +206,7 @@ public class UserService implements IUserService {
     @Transactional
     public void delete(long[] ids) {
         for (Long item : ids) {
-            UserEntity userEntity = userRepository.findById(item).get();
+            UserEntity userEntity = userRepository.findById(item).orElseThrow(() -> new RuntimeException("User not found"));
             userEntity.setStatus(0);
             userRepository.save(userEntity);
         }

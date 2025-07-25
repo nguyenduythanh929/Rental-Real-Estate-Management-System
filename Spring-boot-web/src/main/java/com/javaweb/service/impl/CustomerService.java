@@ -45,7 +45,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public CustomerDTO findById(Long id) {
-        CustomerEntity customerEntity = customerRepository.findById(id).get();
+        CustomerEntity customerEntity = customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found"));
         return customerConverter.toCustomerDTO(customerEntity);
     }
 
@@ -83,7 +83,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public boolean checkAssignedStaff(Long id, Long staffId) {
-        CustomerEntity customer = customerRepository.findById(id).get();
+        CustomerEntity customer = customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found"));
         return customer.getUsers().stream().noneMatch(it -> Objects.equals(it.getId(), staffId));
     }
 }

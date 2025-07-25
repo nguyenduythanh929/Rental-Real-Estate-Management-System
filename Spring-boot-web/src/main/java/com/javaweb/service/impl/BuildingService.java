@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -76,7 +77,7 @@ public class BuildingService implements IBuildingService {
 
     @Override
     public BuildingDTO findBuildingById(Long id) {
-        BuildingEntity buildingEntity = buildingRepository.findById(id).get();
+        BuildingEntity buildingEntity = buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found"));
         return buildingConverter.toBuildingDTO(buildingEntity);
     }
 
@@ -121,8 +122,8 @@ public class BuildingService implements IBuildingService {
 
     @Override
     public boolean checkAssignedStaff(Long id, Long staffId) {
-        BuildingEntity building = buildingRepository.findById(id).get();
-        return building.getUsers().stream().anyMatch(it -> it.getId() == staffId);
+        BuildingEntity building = buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found"));
+        return building.getUsers().stream().anyMatch(it -> Objects.equals(it.getId(), staffId));
     }
 
     private void saveThumbnail(BuildingDTO buildingDTO, BuildingEntity buildingEntity) {

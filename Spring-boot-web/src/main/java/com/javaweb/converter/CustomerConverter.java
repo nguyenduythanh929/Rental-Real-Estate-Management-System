@@ -30,7 +30,7 @@ public class CustomerConverter {
     public CustomerEntity toCustomerEntity(CustomerDTO customerDTO){
         CustomerEntity customerEntityOld = null;
         if(customerDTO.getId() != null){
-            customerEntityOld = customerRepository.findById(customerDTO.getId()).get();
+            customerEntityOld = customerRepository.findById(customerDTO.getId()).orElseThrow(() -> new RuntimeException("Customer not found"));
         }
         CustomerEntity customerEntityNew = modelMapper.map(customerDTO, CustomerEntity.class);
         customerEntityNew.setStatus(Status.CHUA_XU_LY.getStatusName());
